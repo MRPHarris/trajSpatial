@@ -24,10 +24,10 @@ In the future, I hope to add more complex features such as a potential source co
 
 ## Facilitating HYSPLIT cluster analysis
 
-A common way to spatially analyse HYSPLIT endpoints is by clustering endpoints - a feature offered by the HYSPLIT GUI itself. I have not yet found a preferable way to perform clustering outside of the GUI - in any event doing clusters through the GUI has the advantage of being the 'done thing', and you can lean on all the other work using the same method.
+The HYSPLIT GUI has a clustering function that enables spatial [cluster](https://www.ready.noaa.gov/documents/Tutorial/html/traj_clus.html) analysis of supplied endpoints. A series of function in this package provide a straightforward means to collate and archive clusters, allowing relatively fast use of the clustering GUI.
 
-The trajSpatial has a range of functions for collating trajectory endpoint files to facilitate speedy cluster analysis. The HYSPLIT GUI will only accept endpoint files output directly by the model - thus, a file handling framework of sorts is needed. A typical workflow using these functions involves identifying trajectories matching certain cluster criteria - e.g. 'trajectories arriving at x site on y dates'. Files matching the desired dates are fetched from a common directory, and sent to the cluster directory. The clustering is then performed through the GUI, and the output files can be imported back into R. 
+To collate a series of endpoints for cluster analysis, use the `collate_endpts()` function. This will move all supplied endpoints to the supplied directory (e.g., the cluster endpts directory). A vector of dates can also be supplied to match endpoint files. Options for recursion. Something to be aware of is that the cluster analysis fails if any endpoint filenames are <54 characters - the package incorporates adaptive file renaming to prevent this. 
 
+Once the endpoints have been moved to the endpt directory, perform the cluster analysis. Once it is complete, you can move the endpoint files from the endpt directory to an archive with `archive_cluster_endpoints()`.
 
-
-
+Repeat as desired.
