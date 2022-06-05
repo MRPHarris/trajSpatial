@@ -2,4 +2,10 @@
 
 export(archive_cluster_endpoints)
 export(collate_endpts)
+export(trim_trajdata_shp)
+importFrom(raster,crs)
+importFrom(sf,st_as_sf)
+importFrom(sf,st_join)
+importFrom(sp,coordinates)
+importFrom(sp,spTransform)
 importFrom(stringr,str_replace)
