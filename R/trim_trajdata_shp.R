@@ -8,12 +8,14 @@
 #' @param shapefile an ARCGIS shapefile (.shp) loaded into R with e.g. readOGR
 #' @param trajdata a data frame of trajectory endpoints containing lat/lon data of each endpoint
 #' @param xy character vector of the column names containing the x (lon) and y (lat) data within the trajdata data frame.
+#' @param verbose TRUE/FALSE to display progress messages to help with error diagnostics.
 #'
 #' @importFrom raster crs
 #' @importFrom sp coordinates
 #' @importFrom sf st_as_sf
 #' @importFrom sf st_join
 #' @importFrom sp spTransform
+#' @importFrom magrittr %>%
 #'
 #' @export
 #'

@@ -12,6 +12,8 @@ trim_trajdata_shp(shapefile, trajdata, xy = c("lon", "lat"), verbose = TRUE)
 \item{trajdata}{a data frame of trajectory endpoints containing lat/lon data of each endpoint}
 
 \item{xy}{character vector of the column names containing the x (lon) and y (lat) data within the trajdata data frame.}
+
+\item{verbose}{TRUE/FALSE to display progress messages to help with error diagnostics.}
 }
 \description{
 Trims a trajectory data frame to only those points lying within the
