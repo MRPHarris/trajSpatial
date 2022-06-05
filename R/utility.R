@@ -25,3 +25,28 @@ trim_path_int <- function(filenames){
     message("Empty object; no path to trim. Filenames may be missing.")
   }
 }
+
+#' Add vars to trajectory file used for temporal analysis
+#'
+#' @description Adds a number of columns used for time-based analysis of endpoints.
+#'
+#' @param traj_data a dataframe containing trajectory endpoints.
+#' @param verbose TRUE/FALSE to generate init message.
+#'
+#' @noRd
+#'
+format_trajdata_timevars <- function(traj_data, verbose = FALSE){
+  if(isTRUE(verbose)){
+    message("Formatting trajectory data. This may take some time for larger tables.")
+  }
+  formatted_traj_data <- traj_data %>%
+    mutate(hour_start = lubridate::hour(date.start)) %>%
+    mutate(day_start = lubridate::day(date.start)) %>%
+    mutate(month_start = lubridate::month(date.start)) %>%
+    mutate(year_start = lubridate::year(date.start)) %>%
+    mutate(hour_seq = cumsum(c(0, as.numeric(diff(lubridate::hour(date.start))) != 0)) + 1) %>%
+    mutate(day_seq = cumsum(c(0, as.numeric(diff(lubridate::day(date.start))) != 0)) + 1) %>%
+    mutate(month_seq = cumsum(c(0, as.numeric(diff(lubridate::month(date.start))) != 0)) + 1) %>%
+    mutate(year_seq = cumsum(c(0, as.numeric(diff(lubridate::year(date.start))) != 0)) + 1)
+  formatted_traj_data
+}

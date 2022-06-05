@@ -4,7 +4,7 @@
 \alias{trim_trajdata_shp}
 \title{Archive all endpoints currently in the cluster endpoints directory}
 \usage{
-trim_trajdata_shp(shapefile, trajdata, xy = c("lon", "lat"))
+trim_trajdata_shp(shapefile, trajdata, xy = c("lon", "lat"), verbose = TRUE)
 }
 \arguments{
 \item{shapefile}{an ARCGIS shapefile (.shp) loaded into R with e.g. readOGR}

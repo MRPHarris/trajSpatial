@@ -18,10 +18,13 @@
 #' @export
 #'
 trim_trajdata_shp <- function(shapefile,
-                                    trajdata,
-                                    xy = c('lon','lat')){
+                              trajdata,
+                              xy = c('lon','lat'),
+                              verbose = TRUE){
   # Get started.
-  message("Attempting to extract matching trajectory endpoint entries...")
+  if(isTRUE(verbose)){
+    message("Attempting to extract matching trajectory endpoint entries...")
+  }
   targetdat <- trajdata %>%
     relocate(xy[1], .before = 1) %>%
     relocate(xy[2], .before = 1) %>%
@@ -47,13 +50,17 @@ trim_trajdata_shp <- function(shapefile,
   #          Latitude = unlist(map(targetdat$geometry,2)))
   # st_geometry(targetdat2) <- NULL
   ## I could not get over() to work, so the objects are converted to st.
-  message("Converting sp objects to st and performing trim")
+  if(isTRUE(verbose)){
+    message("Converting sp objects to st and performing trim")
+  }
   newbounds <- st_as_sf(shapefile)
   newpoints <- st_as_sf(traj_projected)
   # Trimming done with a join.
   result <- st_join(newpoints, newbounds, left = F)
   indices <- result$X
   trimmed_trajdata <- trajdata[indices,]
-  message("All done!")
+  if(isTRUE(verbose)){
+    message("Trimming complete.")
+  }
   return(trimmed_trajdata)
 }
