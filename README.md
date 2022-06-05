@@ -22,8 +22,16 @@ GUI or splitr. Feel free to browse the code, though!
 
 At the moment, the package provides a straightforward means to trim
 trajectory files to endpoints only falling within the area bounded by a
-supplied shapefile via the function `trim_trajdata_shp()`. Accompanying
-Metric/statistic calculation to follow.
+supplied shapefile via the function `trim_trajdata_shp()`. One can go a
+step further and calculate the metrics of trajectories falling within a
+supplied shapefile by using `trim_trajdata_shp_metrics()`. This will
+return a data frame with the mean and sd of height, pressure, lat and
+lon of all endpoints falling within the shapefile. Three types of
+metrics are available, corresponding to different ways of temporally
+parsing the data: ‘month’ for bulk analysis of the months (i.e. seasonal
+analysis), ‘month_seq’ for months in sequence over the duration of the
+parent trajectory data, and ‘year’ for each year for the duration of the
+parent trajectory data.
 
 In the future, I hope to add more complex features such as a potential
 source contribution function (PSCF) after e.g. Sinclair et al., 2013,
