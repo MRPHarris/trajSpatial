@@ -123,6 +123,7 @@ collate_endpts <- function(from_dir,
 #' @param drop_chars a character vector of any number of characters to be removed.
 #'
 #' @importFrom stringr str_replace
+#' @importFrom stringr str_replace_all
 #'
 #' @noRd
 #'
