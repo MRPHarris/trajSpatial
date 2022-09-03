@@ -126,7 +126,7 @@ format_endpt_forcluster <- function(endpt_file){
   file_lines_new <- file_lines
   ## Get number of spaces each line has to be padded with
   wsps_sizes <- lapply(file_lines, function(x){
-    str_count(x, "\\G ")
+    stringr::str_count(x, "\\G ")
   }) %>%
     unlist(recursive = F)
   ## Get header line
@@ -142,19 +142,23 @@ format_endpt_forcluster <- function(endpt_file){
     t
   }) %>% unlist() > 0)[1:2]]
   headerbasic <- paste(elements_keep, collapse = " ", sep = ' ')
-  header_line_new <- str_pad(string = headerbasic,
+  headerbasic2 <- unlist(str_split(headerbasic," "))
+  headerbasic2[1] <- "1"
+  headerbasic3 <- paste(headerbasic2,collapse = ' ')
+  # headerbasic_element_2 <- unlist(str_split(headerbasic," "))
+  header_line_new <- stringr::str_pad(string = headerbasic3,
                                       side = 'left',
-                                      width = nchar(headerbasic) + wsps_sizes[11], pad = " ")
+                                      width = nchar(headerbasic3) + wsps_sizes[11], pad = " ")
   # file_lines_new[header_line] <- header_line_new
   ## Get data lines
   file_lines_datacheck <- file_lines[(header_line + 1):(length(file_lines))] %>%
-    tidy_gsub_int("\\s\\s*", " ") %>% tidy_gsub_int("^ ","")
+    tidy_gsub("\\s\\s*", " ") %>% tidy_gsub("^ ","")
   file_lines_data <- file_lines[(header_line + 1):(length(file_lines))]
   ## Identify over-flow lines
   file_lines_data_02 <- file_lines_datacheck %>% vapply(FUN.VALUE = logical(1),
                                                         USE.NAMES = FALSE, function(x) {
-                                                          tidy_grepl_int(x, paste0("^", rep("[0-9\\.-]*?",
-                                                                                            2) %>% paste(collapse = " "), "$"))
+                                                          tidy_grepl(x, paste0("^", rep("[0-9\\.-]*?",
+                                                                                        2) %>% paste(collapse = " "), "$"))
                                                         })
   #
   file_lines_data2 <- file_lines_data[which(!file_lines_data_02)]
