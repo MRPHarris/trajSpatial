@@ -7,16 +7,20 @@
 collate_endpts(
   from_dir,
   recurse = FALSE,
+  target_traj = NULL,
   to_dir = "C:/hysplit/cluster/endpts/",
   date_vec = NULL,
   hour_vec = NULL,
-  rename_long_files = c("traj", "YSH", "lon", "lat")
+  rename_long_files = c("traj", "YSH", "lon", "lat"),
+  format_endpts = TRUE
 )
 }
 \arguments{
 \item{from_dir}{full path to the folder where the endpoints are currently stored.}
 
 \item{recurse}{TRUE or FALSE to recurse into sub-directories of the specified folder}
+
+\item{target_traj}{NULL or a string that filenames must contain.}
 
 \item{to_dir}{full file path to the destination folder. C drive default hysplit install cluster folder by default}
 
@@ -25,6 +29,8 @@ collate_endpts(
 \item{hour_vec}{Optional; a numeric vector of double-digit hour intervals matching the desired day-hours starting from 0. E.g. "12" for midday. If supplied, will be combined with the date vector - thus, there should be an hour for every date entry if you choose to specify hours.}
 
 \item{rename_long_files}{Optional; a character vector of strings to remove from filenames. See the internal 'shorten_endpt_filenames'. The HYSPLIT clustering will fail if any filenames exceed 54 characters.}
+
+\item{format_endpts}{TRUE or FALSE to check each endpoint for extended met, and remove this information before transferring to the specified directory.}
 }
 \description{
 Moves endpoints matching a supplied vector of dates to the specified directory. Options for filename shortening.

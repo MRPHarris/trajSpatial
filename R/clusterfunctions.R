@@ -61,19 +61,23 @@ archive_cluster_endpoints <- function(cluster_endpoints_dir = "C:/hysplit/cluste
 #'
 #' @param from_dir full path to the folder where the endpoints are currently stored.
 #' @param recurse TRUE or FALSE to recurse into sub-directories of the specified folder
+#' @param target_traj NULL or a string that filenames must contain.
 #' @param to_dir full file path to the destination folder. C drive default hysplit install cluster folder by default
 #' @param date_vec Optional; a vector of formatted dates in the YYYY-MM-DD format.
 #' @param hour_vec Optional; a numeric vector of double-digit hour intervals matching the desired day-hours starting from 0. E.g. "12" for midday. If supplied, will be combined with the date vector - thus, there should be an hour for every date entry if you choose to specify hours.
 #' @param rename_long_files Optional; a character vector of strings to remove from filenames. See the internal 'shorten_endpt_filenames'. The HYSPLIT clustering will fail if any filenames exceed 54 characters.
+#' @param format_endpts TRUE or FALSE to check each endpoint for extended met, and remove this information before transferring to the specified directory.
 #'
 #' @export
 #'
 collate_endpts <- function(from_dir,
-                                    recurse = FALSE,
-                                    to_dir = "C:/hysplit/cluster/endpts/",
-                                    date_vec = NULL,
-                                    hour_vec = NULL,
-                                    rename_long_files = c("traj","YSH","lon","lat")){
+                               recurse = FALSE,
+                               target_traj = NULL,
+                               to_dir = "C:/hysplit/cluster/endpts/",
+                               date_vec = NULL,
+                               hour_vec = NULL,
+                               rename_long_files = c("traj","YSH","lon","lat"),
+                               format_endpts = TRUE){
   # Format datevec for indexing
   if(!is.null(date_vec)){
     datevec_char <- format(date_vec, "%y-%m-%d")
@@ -82,7 +86,14 @@ collate_endpts <- function(from_dir,
     }
   }
   # Get files
-  all_endpoints <- list.files(from_dir, full.names = TRUE, recursive = recurse)[grep('traj',list.files(from_dir, full.names = FALSE))]
+  if(is.null(target_traj)){
+    all_endpoints <- list.files(from_dir, full.names = TRUE, recursive = recurse)
+  } else {
+    if(!is.character(target_traj)){
+      stop("Please supply 'target_traj' as either NULL or a string.")
+    }
+    all_endpoints <- list.files(from_dir, full.names = TRUE, recursive = recurse)[grep(target_traj,list.files(from_dir, full.names = FALSE))]
+  }
   # Extract the files matching the datevec.
   if(!is.null(date_vec)){
     filematch <- grep(paste(datevec_char,collapse="|"),
@@ -107,9 +118,29 @@ collate_endpts <- function(from_dir,
   } else {
     to_files <- to_dir
   }
-  # Do the file copy
-  file.copy(filematch,to_files)
-  if(file.exists(to_files)){
+  # Do the file copy. format if necessary
+  if(isTRUE(format_endpts)){
+    filelist <- as.list(filematch)
+    # Is there evidence of a mismatch?
+    for(f in seq_along(filelist)){
+      endpt_file_it <- filelist[[f]]
+      filecheck <- endpt_metcheck_single(endpt_file_it)
+      if(isTRUE(filecheck)){
+        # Read in and modify endpoint.
+        newfile <- format_endpt_forcluster(endpt_file_it)
+        write(newfile, to_files[f])
+      } else if(!isTRUE(filecheck)){
+        # No modification needed. Copy file unmodified.
+        file.copy(filematch[f],to_files[f])
+      } else {
+        message("File check for ",endpt_file_it," returned neither TRUE or FALSE. Check file format.")
+      }
+    }
+  } else {
+    file.copy(filematch,to_files)
+  }
+  # Check last file.
+  if(file.exists(to_files[length(to_files)])){
     message("Endpoint files transferred to specified directory.")
   }
 }
