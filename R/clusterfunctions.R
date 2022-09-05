@@ -190,4 +190,36 @@ shorten_endpt_filenames <- function(filenames_in,
   filenames_out
 }
 
+#' Read in cluster change-in-TSV file.
+#'
+#' @description A HYSPLIT clustering attempt will output a file containing data on the
+#'      percent change in total spatial variance or 'change in TSV %'. This file is called
+#'      'DELPCT' and can be found in the cluster working directory after a given clustering attempt.
+#'      This function reads in this file, and optionally trims it to above a given n_clusters.
+#'
+#' @param cluster_wd full file path to the clustering working directory. It is set to 'C:/hysplit/cluster/working/' by default.
+#' @param max_clusters NULL or numeric to trim the returned data frame to only contain less or equal cluster quantities than the number specified.
+#'
+#' @importFrom dplyr slice
+#' @importFrom magrittr %>%
+#'
+#' @export
+#'
+read_DELPCT <- function(cluster_wd = "C:/hysplit/working/cluster/",
+                        max_clusters = NULL){
+  cluster_wd <- "C:/hysplit/cluster/working/"
+  if(!file.exists(paste0(cluster_wd,"DELPCT"))){
+    stop("No DELPCT file found. Run clusters or check specified cluster working directory")
+  } else {
+    f <- read.delim(paste0(cluster_wd,"DELPCT"), sep = "") %>%
+      'colnames<-'(c('n_calculation','n_clusters','TSV_change_pct'))
+    if(!is.null(max_clusters)){
+      f <- f %>%
+        slice(which(n_clusters <= max_clusters))
+    }
+    message("DELPCT file extracted. Note that HYSPLIT quantifies the change in TSV between calculations/nclusters rather than the actual TSV value for that calculation.")
+    f
+  }
+}
+
 
