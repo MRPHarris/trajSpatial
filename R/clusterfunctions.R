@@ -241,7 +241,7 @@ read_DELPCT <- function(cluster_wd = "C:/hysplit/working/cluster/",
 #'
 plot_DELPCT <- function(DELPCT_table,
                         threshold = 20,
-                        max_clusters = 25,
+                        max_clusters = 30,
                         max_change = 100){
   ## Formatting
   DELPCT_table <- DELPCT_table %>%

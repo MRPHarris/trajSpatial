@@ -4,7 +4,7 @@
 \alias{plot_DELPCT}
 \title{Plot change in TSV across clusters using a DELPCT table}
 \usage{
-plot_DELPCT(DELPCT_table, threshold = 20, max_clusters = 25, max_change = 100)
+plot_DELPCT(DELPCT_table, threshold = 20, max_clusters = 30, max_change = 100)
 }
 \arguments{
 \item{DELPCT_table}{an output from read_DELPCT()}
