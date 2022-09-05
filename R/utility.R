@@ -151,7 +151,7 @@ format_endpt_forcluster <- function(endpt_file,
   # headerbasic_element_2 <- unlist(str_split(headerbasic," "))
   header_line_new <- str_pad(string = headerbasic3,
                              side = 'left',
-                             width = nchar(headerbasic3) + wsps_sizes[11], pad = " ")
+                             width = nchar(headerbasic3) + wsps_sizes[header_line], pad = " ")
   # file_lines_new[header_line] <- header_line_new
   ## Get data lines
   file_lines_datacheck <- file_lines[(header_line + 1):(length(file_lines))] %>%
