@@ -110,14 +110,17 @@ endpt_metcheck_single <- function(file){
 #' @description Read in and remove extended data from a single endpoint file.
 #'
 #' @param endpt_file full file-path to a single trajectory endpt file output by the HYSPLIT model.
+#' @param hour_limit numeric or character for the hour limit for endpoints (e.g. "120" will trim each endpoint file to <=120 hours). Fewer hours = faster clustering. Use a negative for backwards trajectories.
 #'
 #' @importFrom stringr str_count
 #' @importFrom stringr str_split
 #' @importFrom stringr str_pad
+#' @importFrom stringr str_detect
 #'
 #' @noRd
 #'
-format_endpt_forcluster <- function(endpt_file){
+format_endpt_forcluster <- function(endpt_file,
+                                    hour_limit = -120){
   # Var passing to match original splitr syntax
   file_i_path <- endpt_file
   file_lines <- readLines(file_i_path, encoding = "UTF-8",
@@ -147,8 +150,8 @@ format_endpt_forcluster <- function(endpt_file){
   headerbasic3 <- paste(headerbasic2,collapse = ' ')
   # headerbasic_element_2 <- unlist(str_split(headerbasic," "))
   header_line_new <- str_pad(string = headerbasic3,
-                                      side = 'left',
-                                      width = nchar(headerbasic3) + wsps_sizes[11], pad = " ")
+                             side = 'left',
+                             width = nchar(headerbasic3) + wsps_sizes[11], pad = " ")
   # file_lines_new[header_line] <- header_line_new
   ## Get data lines
   file_lines_datacheck <- file_lines[(header_line + 1):(length(file_lines))] %>%
@@ -158,7 +161,7 @@ format_endpt_forcluster <- function(endpt_file){
   file_lines_data_02 <- file_lines_datacheck %>% vapply(FUN.VALUE = logical(1),
                                                         USE.NAMES = FALSE, function(x) {
                                                           tidy_grepl_int(x, paste0("^", rep("[0-9\\.-]*?",
-                                                                                        2) %>% paste(collapse = " "), "$"))
+                                                                                            2) %>% paste(collapse = " "), "$"))
                                                         })
   #
   file_lines_data2 <- file_lines_data[which(!file_lines_data_02)]
@@ -167,6 +170,15 @@ format_endpt_forcluster <- function(endpt_file){
     new_line <- substr(line,1,92)
     new_line
   }) %>% unlist()
+  ## hour adjustments
+  if(!is.null(hour_limit)){
+    hour_limit <- as.character(hour_limit)
+    if(!str_detect(hour_limit,"[.]0")){
+      hour_limit <- paste0(hour_limit,".0")
+    }
+    hrind <- which(unlist(lapply(strsplit(new_line_elements,"\\s+"),"[[",10)) == hour_limit)
+    new_line_elements <- new_line_elements[1:hrind]
+  }
   file_lines_data3 <- new_line_elements
   new_file <- c(pre_header_lines,header_line_new,file_lines_data3)
   # write(new_file,paste0(test_dir,"Modified_bad_file"))
