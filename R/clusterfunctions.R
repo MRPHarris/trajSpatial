@@ -222,4 +222,50 @@ read_DELPCT <- function(cluster_wd = "C:/hysplit/working/cluster/",
   }
 }
 
-
+#' Plot change in TSV across clusters using a DELPCT table
+#'
+#' @description Create a plot that mirrors HYSPLIT's 'Display change in total variance'
+#'       plotting function, with change-in-percent thresholds to indicate where a good
+#'       n_clusters might be. Returns a ggplot2 plotting object.
+#'
+#' @param DELPCT_table an output from read_DELPCT()
+#' @param threshold percentage change-in-variance threshold to mark where decent n-cluster specifications might be found. HYSPLIT gives 20 and 30 as options.
+#' @param max_clusters numeric, the right limit of the x-axis.
+#' @param max_change numeric, the upper limit of the y-axis.
+#'
+#' @importFrom magrittr %>%
+#' @importFrom cowplot theme_cowplot
+#' @importFrom dplyr mutate
+#'
+#' @export
+#'
+plot_DELPCT <- function(DELPCT_table,
+                        threshold = 20,
+                        max_clusters = 25,
+                        max_change = 100){
+  ## Formatting
+  DELPCT_table <- DELPCT_table %>%
+    mutate(pct_change = as.numeric((TSV_change_pct/lag(TSV_change_pct) * 100)-100))
+  ## Create pct change threshold values
+  xvals_pct_change <- DELPCT_table$n_clusters[which(DELPCT_table$pct_change > threshold)] + 1
+  yvals_pct_change <- DELPCT_table$TSV_change_pct[which(DELPCT_table$pct_change > threshold)-1]
+  lines_pct_change <- data.frame(x = rep(xvals_pct_change,2),y = c(yvals_pct_change, rep(0,length(yvals_pct_change))),
+                                 np = rep(seq(1,length(xvals_pct_change),1),2))
+  ## Plot
+  plt <- ggplot() +
+    geom_line(data = DELPCT_table, aes(x = n_clusters, y = TSV_change_pct)) +
+    geom_point(data = DELPCT_table, aes(x = n_clusters, y = TSV_change_pct)) +
+    scale_x_continuous(expand = c(0,0), limits = c(0,max_clusters), breaks = seq(0,max_clusters,2.5),
+                       labels = seq(0,max_clusters,2.5)) +
+    scale_y_continuous(expand = c(0,0), limits = c(0,max_change), breaks = seq(0,max_change,10)) +
+    ## change points
+    geom_line(data = lines_pct_change, aes(x,y, group = np), linetype = 'dashed', colour = 'red') +
+    geom_point(data = lines_pct_change[1:(nrow(lines_pct_change)/2),], aes(x,y), colour = 'red') +
+    geom_label(data = lines_pct_change[1:(nrow(lines_pct_change)/2),], aes(x + 1, y + 5, label = x),
+               fill = NA, colour = 'red', label.size = NA) +
+    labs(y = "Change in TSV (%)", x = "Number of clusters") +
+    theme_cowplot(12) +
+    theme(axis.text.x = element_text(colour = c("black","NA")),
+          axis.text.y = element_text(colour = c("black","NA")))
+  plt
+}
