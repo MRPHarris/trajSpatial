@@ -245,12 +245,12 @@ plot_DELPCT <- function(DELPCT_table,
   ## Formatting
   newtable <- DELPCT_table
   newtable <- newtable %>%
-    mutate(pct_change = as.numeric((TSV_change_pct/lag(TSV_change_pct) * 100)-100))
+    dplyr::mutate(pct_change = as.numeric((.[[3]]/lag(.[[3]]) * 100)-100))
   ## Create pct change threshold values
   xvals_pct_change <- newtable$n_clusters[which(newtable$pct_change > threshold)] + 1
   yvals_pct_change <- newtable$TSV_change_pct[which(newtable$pct_change > threshold)-1]
   lines_pct_change <- data.frame(x = rep(xvals_pct_change,2),y = c(yvals_pct_change, rep(0,length(yvals_pct_change))),
-                                 np = rep(seq(1,length(xvals_pct_change),1),2))
+                                 np = rep(seq(1,as.numeric(length(xvals_pct_change)),1),2))
   ## Plot
   plt <- ggplot() +
     geom_line(data = newtable, aes(x = n_clusters, y = TSV_change_pct)) +
