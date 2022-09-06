@@ -207,7 +207,6 @@ shorten_endpt_filenames <- function(filenames_in,
 #'
 read_DELPCT <- function(cluster_wd = "C:/hysplit/working/cluster/",
                         max_clusters = NULL){
-  cluster_wd <- "C:/hysplit/cluster/working/"
   if(!file.exists(paste0(cluster_wd,"DELPCT"))){
     stop("No DELPCT file found. Run clusters or check specified cluster working directory")
   } else {
