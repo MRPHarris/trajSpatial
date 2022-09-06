@@ -243,17 +243,18 @@ plot_DELPCT <- function(DELPCT_table,
                         max_clusters = 30,
                         max_change = 100){
   ## Formatting
-  DELPCT_table <- DELPCT_table %>%
+  newtable <- DELPCT_table
+  newtable <- newtable %>%
     mutate(pct_change = as.numeric((TSV_change_pct/lag(TSV_change_pct) * 100)-100))
   ## Create pct change threshold values
-  xvals_pct_change <- DELPCT_table$n_clusters[which(DELPCT_table$pct_change > threshold)] + 1
-  yvals_pct_change <- DELPCT_table$TSV_change_pct[which(DELPCT_table$pct_change > threshold)-1]
+  xvals_pct_change <- newtable$n_clusters[which(newtable$pct_change > threshold)] + 1
+  yvals_pct_change <- newtable$TSV_change_pct[which(newtable$pct_change > threshold)-1]
   lines_pct_change <- data.frame(x = rep(xvals_pct_change,2),y = c(yvals_pct_change, rep(0,length(yvals_pct_change))),
                                  np = rep(seq(1,length(xvals_pct_change),1),2))
   ## Plot
   plt <- ggplot() +
-    geom_line(data = DELPCT_table, aes(x = n_clusters, y = TSV_change_pct)) +
-    geom_point(data = DELPCT_table, aes(x = n_clusters, y = TSV_change_pct)) +
+    geom_line(data = newtable, aes(x = n_clusters, y = TSV_change_pct)) +
+    geom_point(data = newtable, aes(x = n_clusters, y = TSV_change_pct)) +
     scale_x_continuous(expand = c(0,0), limits = c(0,max_clusters), breaks = seq(0,max_clusters,2.5),
                        labels = seq(0,max_clusters,2.5)) +
     scale_y_continuous(expand = c(0,0), limits = c(0,max_change), breaks = seq(0,max_change,10)) +
