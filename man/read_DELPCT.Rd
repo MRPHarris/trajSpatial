@@ -4,7 +4,11 @@
 \alias{read_DELPCT}
 \title{Read in cluster change-in-TSV file.}
 \usage{
-read_DELPCT(cluster_wd = "C:/hysplit/working/cluster/", max_clusters = NULL)
+read_DELPCT(
+  cluster_wd = "C:/hysplit/working/cluster/",
+  max_clusters = NULL,
+  verbose = F
+)
 }
 \arguments{
 \item{cluster_wd}{full file path to the clustering working directory. It is set to 'C:/hysplit/cluster/working/' by default.}

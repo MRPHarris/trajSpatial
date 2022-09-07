@@ -206,7 +206,8 @@ shorten_endpt_filenames <- function(filenames_in,
 #' @export
 #'
 read_DELPCT <- function(cluster_wd = "C:/hysplit/working/cluster/",
-                        max_clusters = NULL){
+                        max_clusters = NULL,
+                        verbose = F){
   if(!file.exists(paste0(cluster_wd,"DELPCT"))){
     stop("No DELPCT file found. Run clusters or check specified cluster working directory")
   } else {
@@ -216,7 +217,9 @@ read_DELPCT <- function(cluster_wd = "C:/hysplit/working/cluster/",
       f <- f %>%
         slice(which(n_clusters <= max_clusters))
     }
-    message("DELPCT file extracted. Note that HYSPLIT quantifies the change in TSV between calculations/nclusters rather than the actual TSV value for that calculation.")
+    if(isTRUE(verbose)){
+      message("DELPCT file extracted. Note that HYSPLIT quantifies the change in TSV between calculations/nclusters rather than the actual TSV value for that calculation.")
+    }
     f
   }
 }
