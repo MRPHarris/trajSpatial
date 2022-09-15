@@ -234,6 +234,8 @@ read_DELPCT <- function(cluster_wd = "C:/hysplit/working/cluster/",
 #' @param threshold percentage change-in-variance threshold to mark where decent n-cluster specifications might be found. HYSPLIT gives 20 and 30 as options.
 #' @param max_clusters numeric, the right limit of the x-axis.
 #' @param max_change numeric, the upper limit of the y-axis.
+#' @param lab_x_offset numeric, the x-axis offset of threshold exceeding point-labels from their respective point.
+#' @param lab_y_offset numeric, the y-axis offset of threshold exceeding point-labels from their respective point.
 #'
 #' @importFrom magrittr %>%
 #' @importFrom cowplot theme_cowplot
@@ -244,7 +246,9 @@ read_DELPCT <- function(cluster_wd = "C:/hysplit/working/cluster/",
 plot_DELPCT <- function(DELPCT_table,
                         threshold = 20,
                         max_clusters = 30,
-                        max_change = 100){
+                        max_change = 100,
+                        lab_x_offset = 1,
+                        lab_y_offset = 5){
   ## Formatting
   newtable <- DELPCT_table
   newtable <- newtable %>%
@@ -266,7 +270,7 @@ plot_DELPCT <- function(DELPCT_table,
     ## change points
     geom_line(data = lines_pct_change, aes(x,y, group = np), linetype = 'dashed', colour = 'red') +
     geom_point(data = lines_pct_change[1:(nrow(lines_pct_change)/2),], aes(x,y), colour = 'red') +
-    geom_label(data = lines_pct_change[1:(nrow(lines_pct_change)/2),], aes(x + 1, y + 5, label = x),
+    geom_label(data = lines_pct_change[1:(nrow(lines_pct_change)/2),], aes(x + lab_x_offset, y + lab_y_offset, label = x),
                fill = NA, colour = 'red', label.size = NA) +
     labs(y = "Change in TSV (%)", x = "Number of clusters") +
     theme_cowplot(12) +

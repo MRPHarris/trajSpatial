@@ -4,7 +4,14 @@
 \alias{plot_DELPCT}
 \title{Plot change in TSV across clusters using a DELPCT table}
 \usage{
-plot_DELPCT(DELPCT_table, threshold = 20, max_clusters = 30, max_change = 100)
+plot_DELPCT(
+  DELPCT_table,
+  threshold = 20,
+  max_clusters = 30,
+  max_change = 100,
+  lab_x_offset = 1,
+  lab_y_offset = 5
+)
 }
 \arguments{
 \item{DELPCT_table}{an output from read_DELPCT()}
@@ -14,6 +21,10 @@ plot_DELPCT(DELPCT_table, threshold = 20, max_clusters = 30, max_change = 100)
 \item{max_clusters}{numeric, the right limit of the x-axis.}
 
 \item{max_change}{numeric, the upper limit of the y-axis.}
+
+\item{lab_x_offset}{numeric, the x-axis offset of threshold exceeding point-labels from their respective point.}
+
+\item{lab_y_offset}{numeric, the y-axis offset of threshold exceeding point-labels from their respective point.}
 }
 \description{
 Create a plot that mirrors HYSPLIT's 'Display change in total variance'
