@@ -32,6 +32,7 @@ trim_trajdata_shp <- function(shapefile,
     relocate(xy[2], .before = 1) %>%
     rename(Longitude = 2, Latitude = 1)
   if(!"X" %in% colnames(targetdat)){
+    rownames(targetdat) <- 1:nrow(targetdat)
     targetdat <- targetdat %>%
     mutate(X = row_number())
   }
