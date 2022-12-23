@@ -51,7 +51,7 @@ unweighted.
 
 The HYSPLIT GUI has a clustering function that enables spatial
 [cluster](https://www.ready.noaa.gov/documents/Tutorial/html/traj_clus.html)
-analysis of supplied endpoints. A series of function in this package
+analysis of supplied endpoints. A series of functions in this package
 provide a straightforward means to collate and archive clusters,
 allowing relatively fast use of the clustering GUI.
 
@@ -69,3 +69,20 @@ from the endpt directory to an archive with
 `archive_cluster_endpoints()`.
 
 Repeat as desired.
+
+## Parsing and analysis of cluster files produced by HYSPLIT
+
+The HYSPLIT clustering program produces a range of files (‘Cmean’,
+‘cluslist’) at various points in a clustering analysis. These files are
+variously used to store information on which endpoint files
+(i.e. trajectories) are associated with which clusters, and to plot the
+mean trajectories of said clusters. These files can be read into R and
+analysed outside of the GUI. A suite of functions are provided in this
+package to read, analyse, and plot the various outputs of the clustering
+program. These can be used to, for example, circumvent the
+[5000-trajectory hard-coded
+limit](https://hysplitbbs.arl.noaa.gov/viewtopic.php?f=3&t=2466) of the
+HYSPLIT cluster mean-assignment program (‘trajmean’), that prevents any
+visualising of mean trajectories in large analyses. At present the mean
+trajectory calculation uses a simple geometric mean, which produces
+slight differences in mean trajectory paths to the HYSPLIT program.
