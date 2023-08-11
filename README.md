@@ -60,7 +60,7 @@ To collate a series of endpoints for cluster analysis, use the
 the supplied directory (e.g., the cluster endpts directory). A vector of
 dates can also be supplied to match endpoint files. Options for
 recursion. Something to be aware of is that the cluster analysis fails
-if any endpoint filenames are \<54 characters - the package incorporates
+if any endpoint filenames are \>54 characters - the package incorporates
 adaptive file renaming to prevent this.
 
 Once the endpoints have been moved to the endpt directory, perform the
