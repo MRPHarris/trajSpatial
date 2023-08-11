@@ -682,7 +682,7 @@ recode_cluslist <- function(cluslist,
 
 #' Recoding clusmean table number assignments
 #'
-#' @description The numbering of clusters is determine by the algorithm, and as such can be a bit of a nightmare when plotting.
+#' @description The numbering of clusters is determined by the algorithm, and as such can be a bit of a nightmare when plotting.
 #'      This function offers a simple way to recode the number of each cluster in a clusmean file.
 #'
 #' @param clusmean a single clusmean file, such as a direct output from read_meanclus_tdump().
