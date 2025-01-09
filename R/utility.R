@@ -1,5 +1,26 @@
 # Non-exported utility functions.
 
+#' Ensure a character string ends in a forward slash
+#'
+#' @description Ensure a characters string (e.g., a filepath) ends in a forward slash so directories and files are obtained/written correctly by R.
+#'
+#' @param string a character string.
+#'
+#' @noRd
+#'
+ensure_path_slash <- function(string, os = "win"){
+  if(os == "win"){
+    if(substr(string, nchar(string)-1+1, nchar(string)) != "/"){
+      newstring <- paste0(string,"/")
+    } else {
+      newstring <- string
+    }
+  } else {
+    stop("Oops, OS support only includes windows at this stage.")
+  }
+  newstring
+}
+
 #' Remove the file path from a given file or folder name. Borrowed from SampleQueue package.
 #'
 #' @description Removes the file or folder path from a given file/folder name by splitting the path at every "/", and getting rid of all but the last set of characters. If given a short filename (no path), the same string will just be spat out the other end unchanged.
@@ -177,7 +198,9 @@ format_endpt_forcluster <- function(endpt_file,
       hour_limit <- paste0(hour_limit,".0")
     }
     hrind <- which(unlist(lapply(strsplit(new_line_elements,"\\s+"),"[[",10)) == hour_limit)
-    new_line_elements <- new_line_elements[1:hrind]
+    if(!isempty(hrind)){
+      new_line_elements <- new_line_elements[1:hrind]
+    }
   }
   file_lines_data3 <- new_line_elements
   new_file <- c(pre_header_lines,header_line_new,file_lines_data3)

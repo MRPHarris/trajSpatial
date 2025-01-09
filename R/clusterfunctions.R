@@ -79,6 +79,9 @@ collate_endpts <- function(from_dir,
                                hour_vec = NULL,
                                rename_long_files = c("traj","YSH","lon","lat"),
                                format_endpts = TRUE){
+  # Checks
+  from_dir <- from_dir %>% ensure_path_slash()
+  to_dir <- to_dir %>% ensure_path_slash()
   # Format datevec for indexing
   if(!is.null(date_vec)){
     datevec_char <- format(date_vec, "%y-%m-%d")
@@ -101,6 +104,10 @@ collate_endpts <- function(from_dir,
                       all_endpoints, value=TRUE)
   } else {
     filematch <- all_endpoints
+  }
+  # Check if they exceed 8
+  if(length(filematch) < 16){
+    warning("Clustering requires at least 16 trajectories.")
   }
   # Get longest length of filematches.
   char_check <- max(unique(nchar(filematch)), na.rm = T)
@@ -145,6 +152,144 @@ collate_endpts <- function(from_dir,
     message("Endpoint files transferred to specified directory.")
   }
 }
+
+#' Move all files in one directory to another
+#'
+#' @description Performs the 'archive' function from the HYSPLIT cluster GUI if used on the cluster working directory. All files are moved from the from_dir to the to_dir. By default, existing files in the archive are themselves archived.
+#'
+#' @param from_dir full path to the folder containing the files. Windows cluster working directory by default.
+#' @param to_dir full file path to the destination folder. Windows cluster archive by default.
+#' @param archive_to_dir TRUE/FALSE to archive files currently in the to_dir. They will be moved to a timestamped folder within a new subfolder named 'previous'.
+#' @param archive_name NULL or character string. If specified, adds the character to the timestamped subfolder used to archive existing to_dir contents.
+#' @param overwrite TRUE/FALSE to overwrite existing to_dir folder contents if no archiving is performed.
+#' @param verbose TRUE/FALSE to print status messages.
+#'
+#' @importFrom pracma isempty
+#' @importFrom magrittr %>%
+#'
+#' @export
+#'
+clear_dir <- function(from_dir = "C:/hysplit/cluster/working/",
+                      to_dir = "C:/hysplit/cluster/archive/",
+                      archive_to_dir = TRUE,
+                      archive_name = NULL,
+                      overwrite = TRUE,
+                      verbose = TRUE){
+  # Checks
+  from_dir <- from_dir %>% ensure_path_slash()
+  to_dir <- to_dir %>% ensure_path_slash()
+  # List files without directories
+  files <- list.files(from_dir, full.names = TRUE)
+  files <- files[!file.info(files)$isdir]
+  if(isempty(files)){
+    # That's it folks
+    if(verbose){message("No files in the specified directory. It's clear!")}
+  } else {
+    # Carry on.
+    # First, prep the to_dir. Do files need archiving?
+    if(isTRUE(archive_to_dir)){
+      # Get the files in the archive dir
+      archive_existing_files <- list.files(to_dir, full.names = TRUE, recursive = FALSE)
+      archive_existing_files <- archive_existing_files[!file.info(archive_existing_files)$isdir]
+      if(isempty(archive_existing_files)){
+        if(verbose){message("No files in ",to_dir," to archive. Continuing to copy operation.")}
+      } else {
+        # Archive the previous directory
+        # Create the top-level archive-archive
+        if(!dir.exists(paste0(to_dir,"previous/"))){
+          dir.create(paste0(to_dir,"previous/"))
+        }
+        # Now prep this current previous dir.
+        hour <- substr(Sys.time(),12,13) # get current time
+        min <- substr(Sys.time(),15,16)
+        sec <- substr(Sys.time(),18,19)
+        if(!is.null(archive_name)){
+          archive_folder_name <- paste0("previous-",archive_name,"-",Sys.Date(),"-hms-",hour,"-",min,"-",sec,"/")
+        } else {
+          archive_folder_name <- paste0("previous-",Sys.Date(),"-hms-",hour,"-",min,"-",sec,"/")
+        }
+        archive_folder_name_long <- paste0(to_dir,"previous/",archive_folder_name)
+        # Now create the clear folder
+        dir.create(path = archive_folder_name_long) # create archive folder
+        # Copy the files
+        file.copy(archive_existing_files,archive_folder_name_long) # move all files in endpts_filelist to that directory.
+        # remove previous
+        file.remove(archive_existing_files)
+      }
+    }
+    # Now, do the main file moving.
+    file.copy(from = files,to = to_dir, overwrite = overwrite)
+    file.remove(files)
+    if(verbose){message("Files moved successfully to ",to_dir)}
+  }
+}
+
+#' Make an INFILE for a cluster analysis.
+#'
+#' @description The INFILE is created during the clustering setup and lists all the endpoints to be supplied to the clustering program.
+#'
+#' @param endpoint_dir A full path to the directory containing the endpoints to be used for clustering.
+#' @param cluster_wd The cluster working directory. Defaults to the standard location for a windows default install.
+#' @param base_name A string used to subset endpoint files. NULL by default, so all endpoints in the supplied directory are used.
+#' @param flag_longfilenames TRUE/FALSE to print message if any endpoints have a filename exceeding 54 characters.\
+#' @param disallowed_flags character strings (supplied as a character vector) to be used to match files to be excluded from the INFILE.
+#' @param export TRUE/FALSE to write the INFILE to the supplied cluster working directory.
+#' @param verbose TRUE/FALSE to print status message
+#'
+#' @importFrom magrittr %>%
+#'
+#' @export
+#'
+make_INFILE <- function(endpoint_dir = "C:/hysplit/cluster/endpts/",
+                        cluster_wd = "C:/hysplit/cluster/working/",
+                        base_name = NULL,
+                        flag_longfilenames = FALSE,
+                        disallowed_flags = "readme",
+                        export = TRUE,
+                        verbose = FALSE){
+  # Ensure paths end in slashes
+  endpoint_dir <- endpoint_dir %>% ensure_path_slash()
+  cluster_wd <- cluster_wd %>% ensure_path_slash()
+  if(!dir.exists(endpoint_dir)){
+    stop("The supplied endpoint directory does not exist.")
+  }
+  if(!dir.exists(cluster_wd)){
+    stop("The supplied cluster working directory does not exist.")
+  }
+  # Get them names
+  fdat <- list.files(path = endpoint_dir, full.names = T)
+  fdat <- fdat[!file.info(fdat)$isdir]
+  # Remove the specified files, if it's there.
+  forbidden_matches <- grep(paste(disallowed_flags,collapse="|"),
+                            fdat)
+  fdat <- fdat[-c(forbidden_matches)]
+  # Check for the specified name.
+  fdat_short = fdat %>% trim_path_int()
+  if(is.null(base_name)){
+    fdat_base = fdat
+  } else {
+    fdat_base = fdat[grep(base_name,fdat_short)]
+  }
+  # flag if req
+  # This will probably be moved elsewhere but useful here for now.
+  if(isTRUE(flag_longfilenames)){
+    lengths <- unlist(lapply(fdat %>% trim_path_int(), nchar))
+    if(any(lengths > 54)){
+      message("Some endpoint filenames are longer than 54 characters. Clustering will fail as a result.")
+    }
+  }
+  if(isTRUE(export)){
+    write.table(fdat,
+                file = paste0(cluster_wd,"INFILE"),
+                quote = FALSE,
+                row.names = FALSE,
+                col.names = FALSE)
+    if(verbose){
+      message("INFILE created.")
+    }
+  }
+}
+
 
 #' Shorten endpoint filenames.
 #'
