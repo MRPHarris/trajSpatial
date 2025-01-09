@@ -42,6 +42,10 @@ for bulk analysis of the months (i.e. seasonal analysis), ‘month_seq’
 for months in sequence over the duration of the parent trajectory data,
 and ‘year’ for each year for the duration of the parent trajectory data.
 
+The package also provides a function to produce 1-degree gridded frequency 
+data via `get_freq_polygrid()`. This will produce a gridded frequency polygons
+that can be plotted directly in ggplot using geom_polygon.
+
 In the future, I hope to add more complex features such as a potential
 source contribution function (PSCF) after e.g. Sinclair et al., 2013,
 but for now the spatial frequencies produced by the package are
