@@ -62,21 +62,103 @@ There are many ways to spatially cluster trajectory endpoint data [@Dorling1992;
 
 Hierarchical clustering:
 
-* `stats` package. The function `stats::hclust()` will compute one of several hierarchical clustering methods on a distance matrix produced by `stats::dist()`.
-* The HYSPLIT cluster algorithm. The [HYSPLIT-native clustering method](https://www.ready.noaa.gov/documents/Tutorial/html/traj_clus.html) uses hierarchical clustering based upon Ward variance minimization.
+* `stats` package. The function `stats::hclust()` will compute one of several hierarchical clustering methods on a distance matrix produced by `stats::dist()`. This could presumably be applied to trajectory data.
+* The HYSPLIT cluster algorithm. The [HYSPLIT-native clustering method](https://www.ready.noaa.gov/documents/Tutorial/html/traj_clus.html) uses hierarchical clustering based upon Ward variance minimization. The rest of this tutorial deals with using this method. I have found it best for trajectories at higher latitudes.
 
 K-means clustering:
 
 * K-means clustering (`stats` package). The function `stats::hclust()` will compute kmeans on a supplied matrix using one of several different algorithms.
 * K-means 'around medoid' clustering using either Euclidean or angle-informed distances (`openair package`). This is allegedly a more robust version of k-means [@Carslaw2012;@Reynolds2006;@Schubert2021]. A trajectory dataframe from `splitr::trajectory_read()` can be converted to an openair-compliant trajectory dataset with `trajSpatial::convert_openair()`.
 
-## Conducting hierarchical (Ward variance minimisation) clustering with trajSpatial
+## Conducting hierarchical (Ward variance minimisation) clustering with trajSpatial and HYSPLIT
 
-This tutorial assumes you've run some trajectories with the splitr package. This means you have successfully installed the hysplit program and its dependencies, and then run the model through splitr.
+This tutorial assumes you've run some trajectories with the splitr package, ideally of sufficient quantity to warrant clustering. The algorithm will not run with fewer than 16 trajectories. This means you have successfully installed the hysplit program and its dependencies, and then run the model through splitr. You have a series of endpoint files sitting somewhere on your computer, and splitr has returned you a data frame of the endpoint data variables (lat, lon, timestamps, etc.) in your R environment. You will need to be able to run not just HYSPLIT (through e.g., splitr or the command-line), but also the GUI, in order to run the clustering algorithm.
+
+```{r eval=FALSE, include=TRUE}
+install.packages('devtools') # Install the devtools package if necessary.
+devtools::install_github("MRPHarris/trajSpatial")
+```
+
+Currently, this package provides functions to (1) assist in managing endpoint files before and after clustering, and (2) parsing/analysing the outputs from the clustering algorithm provided by the HYSPLIT program. At present, clustering itself *is still performed using the HYSPLIT GUI* ([Relevant user guide page](https://www.ready.noaa.gov/hysplitusersguide/S255.htm)). Most of the internal package functions were written on a windows PC, and so there may be some assumptions made about file paths and other OS-specific things. 
+
+A typical workflow for clustering with the trajSpatial package goes something like:
+
+1. Remove and archive any existing endpoint files from the endpoints directory (on windows, C:/hysplit/cluster/endpts/), using `archive_cluster_endpoints()`. This will move them to a subdirectory within the cluster/endpts folder called 'archive'. If you don't care about keeping the files currently in that directory (i.e., you have them stored elsewhere), you can use `clear_dir()`. This will delete all endpoint files in the cluster/endpts folder.
+
+2. Move the endpoint files to be clustered to the endpoints directory, using `collate_endpts()`. 
+
+3. Create the cluster INFILE. You can do this in the HYSPLIT GUI, or with the function `make_INFILE()`.
+
+4. In the HYSPLIT GUI, run the cluster analysis. Special runs -> Run cluster analysis. 
+
+5. Optionally, read and plot the cluster algorithm's total spatial variance (TSV) data with `read_DELPCT()` and `plot_DELPCT()`.
+
+6. Narrow down on a desired number of clusters by plotting the clusters (in the GUI) and looking for significant changes in TSV using the DELPCT files in the GUI or from the previous step. It is considered best practice to choose a number of clusters that proceeds a large increase in TSV (which will increase as the # of clusters decreases).
+
+7. In the GUI, choose the desired number of clusters and hit 'display means'. This will produce necessary tdump files for this set of clusters that are required for subsequent steps. 
+
+8. Display the cluster means
+
+### Setting up a cluster analysis
+
+The HYSPLIT cluster algorithm takes in the endpoint files produced by the trajectory model. By default, the cluster program will look for them within the 'cluster/endpts/' subdirectory (on Windows, this is by default found at C:/hysplit/cluster/endpts/'). 
+
+
+```{r, message = FALSE, warning = FALSE, include = FALSE}
+## Dummy code from relevant script TBA
+
+## Section notes
+# Code for running clusters with HYSPLIT.
+## Setup: create directories for the import/export requirements.
+date_dir <- era5_dir # where are the date vectors stored?
+cluster_export_dir <- paste0(traj_data_dir_new,"HYSPLIT GUI Clustering/") # where are we exporting cluster data?
+target_dir <- "D:/DATA/HYSPLIT Files/HYSPLIT Runs Aug2022/PH_1500m_240hr_reanalysis_endpoints/" # where are the trajectory endpoint files stored?
+run_name <- "PH_1500m_reanalysis_120hr_precip_2d12h" # what's the name of this trajectory endpoint set?
+## Step 1: collate endpoints using the supplied date vectors.
+type = 'reanalysis'
+# date_dir <- era5_dir
+dates_precip_1pct <- readRDS(file = paste0(date_dir,"precip_1pct_days.rds"))
+if(type == 'reanalysis'){
+  date_vec <- dates_precip_1pct %>%
+    dplyr::filter(date >= as_date("1980-01-01"))
+  date_vec <- date_vec$date
+} else {
+  date_vec <- dates_precip_1pct %>%
+    dplyr::filter(date >= as_date("2005-01-01"))
+  date_vec <- date_vec$date
+}
+archive_cluster_endpoints()
+collate_endpts(from_dir = target_dir,
+               recurse = TRUE,
+               date_vec = date_vec,
+               hour_vec = "12")
+
+## S2: Run trajectories
+# Go into HYSPLIT, and run trajectories.
+
+## Step 3: get the DELPCT file
+# This is now a part of trajSpatial::read_DELPCT()
+library(trajSpatial)
+DELPCT_it <- trajSpatial::read_DELPCT(max_clusters = 100)
+# saveRDS(DELPCT_it, file = paste0(cluster_export_dir,"DELPCT outputs/",run_name,".rds"))
+# write.csv(DELPCT_it,file = paste0(cluster_export_dir,"DELPCT outputs/",run_name,".csv"))
+
+## Optional plotting
+plot_DELPCT(DELPCT_it, threshold = 20)
+
+## Step 4: export the mean files when they are created.
+# After identifying appropriate numbers of trajectories, put them into their means.
+# To do this, 'assign trajectories to means', then hit 'display means'. You don't have to actually plot them,
+# but this second step creates the tdump files.
+
+mean_tabs <- get_clusmeans_tdump()
+
+# Save means
+saveRDS(object = mean_tabs, file = paste0(cluster_export_dir,"Mean cluster files/",run_name,"_means.rds"))
 
 
 
-
+```
 
 ## Draft/out-of-date text below this header
 
