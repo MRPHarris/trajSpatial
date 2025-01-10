@@ -231,8 +231,8 @@ clear_dir <- function(from_dir = "C:/hysplit/cluster/working/",
 #' @param endpoint_dir A full path to the directory containing the endpoints to be used for clustering.
 #' @param cluster_wd The cluster working directory. Defaults to the standard location for a windows default install.
 #' @param base_name A string used to subset endpoint files. NULL by default, so all endpoints in the supplied directory are used.
-#' @param flag_longfilenames TRUE/FALSE to print message if any endpoints have a filename exceeding 54 characters.\
-#' @param disallowed_flags character strings (supplied as a character vector) to be used to match files to be excluded from the INFILE.
+#' @param flag_longfilenames TRUE/FALSE to print message if any endpoints have a filename exceeding 54 characters.
+#' @param disallowed_flags character strings supplied as a character vector to be used to match files to be excluded from the INFILE.
 #' @param export TRUE/FALSE to write the INFILE to the supplied cluster working directory.
 #' @param verbose TRUE/FALSE to print status message
 #'
