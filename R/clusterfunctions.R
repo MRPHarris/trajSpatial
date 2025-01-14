@@ -146,7 +146,7 @@ collate_endpts <- function(from_dir,
         message("File check for ",endpt_file_it," returned neither TRUE or FALSE. Check file format.")
       }
       if(verbose){
-        if(100 %% f == 0){
+        if(f %% 100 == 0){
           message(f," files transferred.")
         }
       }
