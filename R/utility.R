@@ -179,11 +179,18 @@ format_endpt_forcluster <- function(endpt_file,
     tidy_gsub_int("\\s\\s*", " ") %>% tidy_gsub_int("^ ","")
   file_lines_data <- file_lines[(header_line + 1):(length(file_lines))]
   ## Identify over-flow lines
-  file_lines_data_02 <- file_lines_datacheck %>% vapply(FUN.VALUE = logical(1),
-                                                        USE.NAMES = FALSE, function(x) {
-                                                          tidy_grepl_int(x, paste0("^", rep("[0-9\\.-]*?",
-                                                                                            2) %>% paste(collapse = " "), "$"))
-                                                        })
+  if(any(grepl("NaN",file_lines_datacheck))){
+    file_lines_data_02 <- file_lines_datacheck %>% vapply(FUN.VALUE = logical(1),
+                                                          USE.NAMES = FALSE, function(x) {
+                                                            tidy_grepl_int(x, "NaN")
+                                                          })
+  } else {
+    file_lines_data_02 <- file_lines_datacheck %>% vapply(FUN.VALUE = logical(1),
+                                                          USE.NAMES = FALSE, function(x) {
+                                                            tidy_grepl_int(x, paste0("^", rep("[0-9\\.-]*?",
+                                                                                              2) %>% paste(collapse = " "), "$"))
+                                                          })
+  }
   #
   file_lines_data2 <- file_lines_data[which(!file_lines_data_02)]
   ## Remove cluster-incompatible data
