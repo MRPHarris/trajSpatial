@@ -12,7 +12,8 @@ collate_endpts(
   date_vec = NULL,
   hour_vec = NULL,
   rename_long_files = c("traj", "YSH", "lon", "lat"),
-  format_endpts = TRUE
+  format_endpts = TRUE,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ collate_endpts(
 \item{rename_long_files}{Optional; a character vector of strings to remove from filenames. See the internal 'shorten_endpt_filenames'. The HYSPLIT clustering will fail if any filenames exceed 54 characters.}
 
 \item{format_endpts}{TRUE or FALSE to check each endpoint for extended met, and remove this information before transferring to the specified directory.}
+
+\item{verbose}{TRUE or FALSE to print progress every 100 files. Useful when moving large datasets.}
 }
 \description{
 Moves endpoints matching a supplied vector of dates to the specified directory. Options for filename shortening.

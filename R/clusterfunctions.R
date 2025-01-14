@@ -68,6 +68,7 @@ archive_cluster_endpoints <- function(cluster_endpoints_dir = "C:/hysplit/cluste
 #' @param hour_vec Optional; a numeric vector of double-digit hour intervals matching the desired day-hours starting from 0. E.g. "12" for midday. If supplied, will be combined with the date vector - thus, there should be an hour for every date entry if you choose to specify hours.
 #' @param rename_long_files Optional; a character vector of strings to remove from filenames. See the internal 'shorten_endpt_filenames'. The HYSPLIT clustering will fail if any filenames exceed 54 characters.
 #' @param format_endpts TRUE or FALSE to check each endpoint for extended met, and remove this information before transferring to the specified directory.
+#' @param verbose TRUE or FALSE to print progress every 100 files. Useful when moving large datasets.
 #'
 #' @export
 #'
@@ -78,7 +79,8 @@ collate_endpts <- function(from_dir,
                                date_vec = NULL,
                                hour_vec = NULL,
                                rename_long_files = c("traj","YSH","lon","lat"),
-                               format_endpts = TRUE){
+                               format_endpts = TRUE,
+                           verbose = TRUE){
   # Checks
   from_dir <- from_dir %>% ensure_path_slash()
   to_dir <- to_dir %>% ensure_path_slash()
@@ -142,6 +144,11 @@ collate_endpts <- function(from_dir,
         file.copy(filematch[f],to_files[f])
       } else {
         message("File check for ",endpt_file_it," returned neither TRUE or FALSE. Check file format.")
+      }
+      if(verbose){
+        if(100 %% f == 0){
+          message(f," files transferred.")
+        }
       }
     }
   } else {
