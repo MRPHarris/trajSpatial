@@ -98,7 +98,7 @@ collate_endpts <- function(from_dir,
     if(!is.character(target_traj)){
       stop("Please supply 'target_traj' as either NULL or a string.")
     }
-    all_endpoints <- list.files(from_dir, full.names = TRUE, recursive = recurse)[grep(target_traj,list.files(from_dir, full.names = FALSE))]
+    all_endpoints <- list.files(from_dir, full.names = TRUE, recursive = recurse)[grep(target_traj,list.files(from_dir, full.names = FALSE, recursive = recurse))]
   }
   # Extract the files matching the datevec.
   if(!is.null(date_vec)){
