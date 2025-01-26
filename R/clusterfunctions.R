@@ -64,11 +64,15 @@ archive_cluster_endpoints <- function(cluster_endpoints_dir = "C:/hysplit/cluste
 #' @param recurse TRUE or FALSE to recurse into sub-directories of the specified folder
 #' @param target_traj NULL or a string that filenames must contain.
 #' @param to_dir full file path to the destination folder. C drive default hysplit install cluster folder by default
-#' @param date_vec Optional; a vector of formatted dates in the YYYY-MM-DD format.
+#' @param date_vec Optional; a vector of formatted dates in the YYYY-MM-DD format. Note that to match dates, trajectory endpoint file names must somewhere contain a timestamp in YY-MM-DD-HH format.
 #' @param hour_vec Optional; a numeric vector of double-digit hour intervals matching the desired day-hours starting from 0. E.g. "12" for midday. If supplied, will be combined with the date vector - thus, there should be an hour for every date entry if you choose to specify hours.
 #' @param rename_long_files Optional; a character vector of strings to remove from filenames. See the internal 'shorten_endpt_filenames'. The HYSPLIT clustering will fail if any filenames exceed 54 characters.
 #' @param format_endpts TRUE or FALSE to check each endpoint for extended met, and remove this information before transferring to the specified directory.
 #' @param verbose TRUE or FALSE to print progress every 100 files. Useful when moving large datasets.
+#'
+#' @importFrom stringr str_sub
+#' @importFrom stringr str_extract
+#' @importFrom magrittr %>%
 #'
 #' @export
 #'
@@ -102,8 +106,13 @@ collate_endpts <- function(from_dir,
   }
   # Extract the files matching the datevec.
   if(!is.null(date_vec)){
-    filematch <- grep(paste(datevec_char,collapse="|"),
-                      all_endpoints, value=TRUE)
+    files_short <- trim_path_int(all_endpoints)
+    # Get the dates from filenames in YY-MM-DD format
+    dates_in_endpts <- str_extract(files_short,'(\\d+)-(\\d+)-(\\d+)-(\\d+)') %>%
+      str_sub(., end = -4)
+    # Find matches
+    filematch <- all_endpoints[grepl(paste0(datevec_char, collapse = "|"),
+                                     dates_in_endpts)]
   } else {
     filematch <- all_endpoints
   }

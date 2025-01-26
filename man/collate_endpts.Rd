@@ -25,7 +25,7 @@ collate_endpts(
 
 \item{to_dir}{full file path to the destination folder. C drive default hysplit install cluster folder by default}
 
-\item{date_vec}{Optional; a vector of formatted dates in the YYYY-MM-DD format.}
+\item{date_vec}{Optional; a vector of formatted dates in the YYYY-MM-DD format. Note that to match dates, trajectory endpoint file names must somewhere contain a timestamp in YY-MM-DD-HH format.}
 
 \item{hour_vec}{Optional; a numeric vector of double-digit hour intervals matching the desired day-hours starting from 0. E.g. "12" for midday. If supplied, will be combined with the date vector - thus, there should be an hour for every date entry if you choose to specify hours.}
 
