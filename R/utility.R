@@ -204,11 +204,10 @@ format_endpt_forcluster <- function(endpt_file,
     if(!str_detect(hour_limit,"[.]0")){
       hour_limit <- paste0(hour_limit,".0")
     }
-    # Error fix for files which flow over lines for some reason. This is a brute-force fix; I may regret it later.
-    nle_1 <- strsplit(new_line_elements,"\\s+")
-    nle_ex10 <- nle_1[which(lapply(nle_1,length) > 10)]
-    hrind(which(unlist(lapply(nle_ex10,"[[",10)) == hour_limit))
-    # hrind <- which(unlist(lapply(strsplit(new_line_elements,"\\s+"),"[[",10)) == hour_limit)
+    # nle_1 <- strsplit(new_line_elements,"\\s+")
+    # nle_ex10 <- nle_1[which(lapply(nle_1,length) > 10)]
+    # hrind(which(unlist(lapply(nle_ex10,"[[",10)) == hour_limit))
+    hrind <- which(unlist(lapply(strsplit(new_line_elements,"\\s+"),"[[",10)) == hour_limit)
     if(!isempty(hrind)){
       new_line_elements <- new_line_elements[1:hrind]
     }
