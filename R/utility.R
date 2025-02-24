@@ -218,3 +218,32 @@ format_endpt_forcluster <- function(endpt_file,
   new_file
 }
 
+
+
+#' Return the file path component of a given filename
+#'
+#' @description Given a filename including a full path, return the path.
+#'
+#' @param filename_full A filename, including path, as a character object.
+#'
+#' @noRd
+#'
+return_path <- function(filename_full){
+  path_split <- unlist(strsplit(filename_full,"/"))
+  path_comb = paste0(paste(path_split[c(1:length(path_split)-1)], collapse = "/"),"/")
+  path_comb
+}
+
+#' Replace the path of a file with another
+#'
+#' @description Given a filename including a path, replace this path with another whilst preserving the file name components not from the path.
+#'
+#' @noRd
+
+replace_path <- function(filename_full, new_path){
+  filename_nopath <- trim_path_int(filename_full)
+  filename_new = paste0(ensure_path_slash(new_path),filename_nopath)
+  filename_new
+}
+
+
