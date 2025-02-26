@@ -994,7 +994,7 @@ retro_cluster <- function(trajectory_filenames,
 #' @importFrom rlist list.rbind
 #' @importFrom magrittr %>%
 #' @importFrom dplyr mutate
-#' @importFrom dplyr group
+#' @importFrom dplyr group_by
 #' @importFrom dplyr ungroup
 #' @importFrom dplyr n
 #'

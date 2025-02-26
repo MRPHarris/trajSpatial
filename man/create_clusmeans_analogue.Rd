@@ -16,7 +16,7 @@ create_clusmeans_analogue(
 
 \item{export_directory}{NULL or full file path to a directory. If !NULL, mean trajectory tables will be exported as .csvs.}
 
-\item{endpoint_folder}{full file path to a folder containing the endpoints used in the cluster calculations.}
+\item{endpoint_folder}{full file path to a folder containing the endpoints used in the cluster calculations. If this is different to the file paths found in the cluslist, the endpoint folder will be used instead.}
 
 \item{traj_total_duration_hrs}{numeric; how long were the trajectories run for, in hours?}
 }
