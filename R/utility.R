@@ -43,7 +43,7 @@ trim_path_int <- function(filenames){
     filename_trimmed <- unlist(strsplit(filename,"/"))[length(unlist(strsplit(filename,"/")))]
     filename_trimmed
   } else{
-    message("Empty object; no path to trim. Filenames may be missing.")
+    message("Empty object; no path to trim. Files or filenames may be missing.")
   }
 }
 
@@ -238,8 +238,11 @@ return_path <- function(filename_full){
 #'
 #' @description Given a filename including a path, replace this path with another whilst preserving the file name components not from the path.
 #'
+#' @param filename_full A full filename including path
+#' @param new_path the path that will be used in place of the existing one.
+#'
 #' @noRd
-
+#'
 replace_path <- function(filename_full, new_path){
   filename_nopath <- trim_path_int(filename_full)
   filename_new = paste0(ensure_path_slash(new_path),filename_nopath)

@@ -659,6 +659,7 @@ get_class_percentages <- function(cluslist,
 #' @param export_directory NULL or full file path to a directory. If !NULL, mean trajectory tables will be exported as .csvs.
 #' @param endpoint_folder full file path to a folder containing the endpoints used in the cluster calculations. If this is different to the file paths found in the cluslist, the endpoint folder will be used instead.
 #' @param traj_total_duration_hrs numeric; how long were the trajectories run for, in hours?
+#' @param add_file_identifier optional character to add to the exported file name, if an export directory is provided.
 #'
 #' @importFrom dplyr rename
 #' @importFrom dplyr select
@@ -673,7 +674,8 @@ get_class_percentages <- function(cluslist,
 create_clusmeans_analogue <- function(clustlists,
                                       export_directory = NULL,
                                       endpoint_folder,
-                                      traj_total_duration_hrs = 120){
+                                      traj_total_duration_hrs = 120,
+                                      add_file_identifier = NULL){
   if(is.null(export_directory)){
     message("No export directory specified. Clusmean analogues will be collated into a nested list. This can use a lot of memory for large trajectory clustering datasets.")
   }
@@ -745,9 +747,15 @@ create_clusmeans_analogue <- function(clustlists,
     # Compile this cluslist
     # Export this clusmean
     if(!is.null(export_directory)){
-      clusmean_combined_it <- list.rbind(clust_itlist)
-      write.table(clusmean_combined_it, file = paste0(export_directory,"Cmean1_",nclusters,"_anlg.tdump"))
-      message(paste0("Cmean1_",nclusters,"_anlg.tdump exported"))
+      if(is.null(add_file_identifier)){
+        clusmean_combined_it <- list.rbind(clust_itlist)
+        write.table(clusmean_combined_it, file = paste0(export_directory,"Cmean1_",nclusters,"_anlg.tdump"))
+        message(paste0("Cmean1_",nclusters,"_anlg.tdump exported"))
+      } else {
+        clusmean_combined_it <- list.rbind(clust_itlist)
+        write.table(clusmean_combined_it, file = paste0(export_directory,"Cmean1_",nclusters,"_",add_file_identifier,"_anlg.tdump"))
+        message(paste0("Cmean1_",nclusters,"_anlg.tdump exported"))
+      }
     } else if(is.null(export_directory)){
       clustlists_compiled[[clist]] <- list.rbind(clust_itlist)
       message(paste0("Cmean1_",nclusters," analog added to complist"))

@@ -8,7 +8,8 @@ create_clusmeans_analogue(
   clustlists,
   export_directory = NULL,
   endpoint_folder,
-  traj_total_duration_hrs = 120
+  traj_total_duration_hrs = 120,
+  add_file_identifier = NULL
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ create_clusmeans_analogue(
 \item{endpoint_folder}{full file path to a folder containing the endpoints used in the cluster calculations. If this is different to the file paths found in the cluslist, the endpoint folder will be used instead.}
 
 \item{traj_total_duration_hrs}{numeric; how long were the trajectories run for, in hours?}
+
+\item{add_file_identifier}{optional character to add to the exported file name, if an export directory is provided.}
 }
 \description{
 Experimental function. Takes cluslist files and a set of corresponding trajectories,
