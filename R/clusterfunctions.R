@@ -754,7 +754,7 @@ create_clusmeans_analogue <- function(clustlists,
       } else {
         clusmean_combined_it <- list.rbind(clust_itlist)
         write.table(clusmean_combined_it, file = paste0(export_directory,"Cmean1_",nclusters,"_",add_file_identifier,"_anlg.tdump"))
-        message(paste0("Cmean1_",nclusters,"_anlg.tdump exported"))
+        message(paste0("Cmean1_",nclusters,"_",add_file_identifier,"_anlg.tdump exported"))
       }
     } else if(is.null(export_directory)){
       clustlists_compiled[[clist]] <- list.rbind(clust_itlist)
