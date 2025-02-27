@@ -2,12 +2,12 @@
 % Please edit documentation in R/trim_trajdata_shp.R
 \name{trim_trajdata_shp}
 \alias{trim_trajdata_shp}
-\title{Archive all endpoints currently in the cluster endpoints directory}
+\title{Trim a trajectory dataset to points lying within a shapefile}
 \usage{
 trim_trajdata_shp(shapefile, trajdata, xy = c("lon", "lat"), verbose = TRUE)
 }
 \arguments{
-\item{shapefile}{an ARCGIS shapefile (.shp) loaded into R with e.g. readOGR}
+\item{shapefile}{a shapefile (.shp) loaded into R with e.g. readOGR}
 
 \item{trajdata}{a data frame of trajectory endpoints containing lat/lon data of each endpoint}
 

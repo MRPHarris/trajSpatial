@@ -1,11 +1,11 @@
 # Functions for parsing hysplit trajectory data with shapefiles
 
-#' Archive all endpoints currently in the cluster endpoints directory
+#' Trim a trajectory dataset to points lying within a shapefile
 #'
 #' @description Trims a trajectory data frame to only those points lying within the
 #'     bounds of a shapefile polygon.
 #'
-#' @param shapefile an ARCGIS shapefile (.shp) loaded into R with e.g. readOGR
+#' @param shapefile a shapefile (.shp) loaded into R with e.g. readOGR
 #' @param trajdata a data frame of trajectory endpoints containing lat/lon data of each endpoint
 #' @param xy character vector of the column names containing the x (lon) and y (lat) data within the trajdata data frame.
 #' @param verbose TRUE/FALSE to display progress messages to help with error diagnostics.
