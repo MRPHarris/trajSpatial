@@ -218,7 +218,50 @@ format_endpt_forcluster <- function(endpt_file,
   new_file
 }
 
-
+#' Shorten endpoint filenames.
+#'
+#' @description Adaptively shorten a set of supplied filenames by removing the supplied characters.
+#'     Special handling of "lat" and "lon" if supplied. Returns the filenames in 'short' format (without preceding path).
+#'
+#' @param filenames_in a set of filenames to be shortened
+#' @param drop_chars a character vector of any number of characters to be removed.
+#'
+#' @importFrom stringr str_replace
+#' @importFrom stringr str_replace_all
+#'
+#' @noRd
+#'
+shorten_endpt_filenames <- function(filenames_in,
+                                    drop_chars = c("traj","YSH","lon","lat")){
+  # Constrict filenames.
+  if(grep("/",filenames_in[1])){
+    filenames_in <- trim_path_int(filenames_in)
+  }
+  if(is.null(drop_chars)){
+    drop_chars <- c("traj","YSH","lon","lat")
+  } else if(!is.character(drop_chars)){
+    stop("Please provide drop_chars as a character vector.")
+  }
+  # Now we do the dropping, for each of the character elements.
+  if("lat" %in% drop_chars){
+    # Lat special - uses regex to get rid of the coordinates too.
+    filenames_in <- gsub("lat*[_]([^_]+)[_]", replacement = "_",x = filenames_in)
+    drop_chars <- drop_chars[-which(drop_chars == 'lat')]
+  }
+  if("lon" %in% drop_chars){
+    filenames_in <- gsub("lon*[_]([^_]+)[_]", replacement = "_",x = filenames_in)
+    drop_chars <- drop_chars[-which(drop_chars == 'lon')]
+  }
+  # General removal of specified drop chars
+  filenames_in <- str_replace_all(filenames_in,paste(drop_chars, collapse = "|"),"")
+  # Final checks: repeated underscores, leading and trailing dashes.
+  filenames_in <- str_replace(filenames_in,"__","-")
+  filenames_in <- str_replace(filenames_in,"--","-")
+  filenames_in <- gsub('^\\-|\\-$', '', filenames_in) # Remove leading or trailing dashes
+  # Final var pass
+  filenames_out <- filenames_in
+  filenames_out
+}
 
 #' Return the file path component of a given filename
 #'
