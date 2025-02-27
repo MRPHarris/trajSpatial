@@ -1,8 +1,5 @@
 # Functions for creating lat-lon frequency grids from trajectory endpoint data
 
-# At present, only a one-degree grid size is supported. This code was all written for a southern hemisphere stereographic
-# projection of circum-antarctic trajectory data.
-
 # The method here involves a few steps
 # 1. The first is to coerce the endpoint data into gridded information. This is achieved
 #   by rounding the lat/lon coordinates for each endpoint to the nearest halfway point between
@@ -12,10 +9,11 @@
 # With some luck, this means that we can 'seamlessly' plot gridded frequency data for
 # trajectory endpoints within ggplot
 
-
 #' Produce gridded frequency data from hysplit endpoint latitude and longitude coordinates.
 #'
-#' @description Using gridded trajectory model endpoint data lat/lon coordinates, produce 1-degree frequency polygons in a grid. Output can be plotted in ggplot.
+#' @description Using gridded trajectory model endpoint data lat/lon coordinates, produce 1-degree
+#'      frequency polygons in a grid. Output can be plotted in ggplot. At present, only a
+#'      one-degree grid size is supported.
 #'
 #' @param endpoints_lat numerical data containing the latitude coordinates of hysplit endpoints.
 #' @param endpoints_lon numerical data containing the longitude coordinates of hysplit endpoints.
@@ -29,10 +27,11 @@
 #' @importFrom dplyr semi_join
 #' @importFrom dplyr anti_join
 #' @importFrom dplyr arrange
+#' @importFrom magrittr %>%
 #'
 #' @export
 #'
-get_freq_polygrid <- function(endpoints_lat,
+create_freq_polygrid <- function(endpoints_lat,
                               endpoints_lon,
                               grid_min_lat = -90,
                               grid_max_lat = -40,
@@ -81,50 +80,6 @@ get_freq_polygrid <- function(endpoints_lat,
   polygrid <- generate_latlon_gridpoly(grid_freqs)
   ## Return
   return(polygrid)
-}
-
-
-#' Generate a lattitude-longitude halfgrid.
-#'
-#' @description Generate a grid of halfway points between latitude/longitude whole integers within the specified bounding box.
-#'
-#' @param min_lat The minimum latitude. Lower edge of the bounding box.
-#' @param max_lat The maximum latitude. Upper edge of the bounding box.
-#' @param min_lon The minimum longitude. Left edge of the bounding box.
-#' @param max_lon The maximum longitude. Right edge of the bounding box.
-#'
-#' @importFrom dplyr relocate
-#' @importFrom magrittr %>%
-#'
-#' @noRd
-#'
-generate_latlon_halfgrid <- function(min_lat,max_lat,min_lon,max_lon){
-  ## Code here based on: #https://stackoverflow.com/questions/43612903/how-to-properly-plot-projected-gridded-data-in-ggplot2
-  ## test vars
-  # min_lat = -90
-  # max_lat = -40
-  # min_lon = -180
-  # max_lon = 180
-  # Issue: max values are going to be rounded up.
-  ## Create integer sequences, accounting for negatives.
-  min_lat_int <- ifelse(sign(min_lat) == -1,
-                        yes = as.numeric(as.integer(min_lat)) + 0.5,
-                        no = as.numeric(as.integer(min_lat)) - 0.5)
-  max_lat_int <- ifelse(sign(max_lat) == -1,
-                        yes = as.numeric(as.integer(max_lat)) + 0.5,
-                        no = as.numeric(as.integer(max_lat)) - 0.5)
-  min_lon_int <- ifelse(sign(min_lon) == -1,
-                        yes = as.numeric(as.integer(min_lon))  + 0.5,
-                        no = as.numeric(as.integer(min_lon)) - 0.5)
-  max_lon_int <- ifelse(sign(max_lon) == -1,
-                        yes = as.numeric(as.integer(max_lon))  + 0.5,
-                        no = as.numeric(as.integer(max_lon)) - 0.5)
-  ## Create the grid
-  lat_seq <- seq(min_lat_int,max_lat_int,1)
-  lon_seq <- seq(min_lon_int,max_lon_int,1)
-  grid <- expand.grid(lon_seq,lat_seq) %>%
-    'colnames<-'(c("lon","lat")) %>%
-    relocate(lon,.after = lat)
 }
 
 #' Generate a grid of polygons for plotting.
@@ -182,5 +137,50 @@ generate_latlon_gridpoly <- function(halfgrid,
   ## Return
   return(new_dat)
 }
+
+#' Generate a lattitude-longitude halfgrid.
+#'
+#' @description Generate a grid of halfway points between latitude/longitude whole integers within the specified bounding box.
+#'
+#' @param min_lat The minimum latitude. Lower edge of the bounding box.
+#' @param max_lat The maximum latitude. Upper edge of the bounding box.
+#' @param min_lon The minimum longitude. Left edge of the bounding box.
+#' @param max_lon The maximum longitude. Right edge of the bounding box.
+#'
+#' @importFrom dplyr relocate
+#' @importFrom magrittr %>%
+#'
+#' @noRd
+#'
+generate_latlon_halfgrid <- function(min_lat,max_lat,min_lon,max_lon){
+  ## Code here based on: https://stackoverflow.com/questions/43612903/how-to-properly-plot-projected-gridded-data-in-ggplot2
+  ## test vars
+  # min_lat = -90
+  # max_lat = -40
+  # min_lon = -180
+  # max_lon = 180
+  # Issue: max values are going to be rounded up.
+  ## Create integer sequences, accounting for negatives.
+  min_lat_int <- ifelse(sign(min_lat) == -1,
+                        yes = as.numeric(as.integer(min_lat)) + 0.5,
+                        no = as.numeric(as.integer(min_lat)) - 0.5)
+  max_lat_int <- ifelse(sign(max_lat) == -1,
+                        yes = as.numeric(as.integer(max_lat)) + 0.5,
+                        no = as.numeric(as.integer(max_lat)) - 0.5)
+  min_lon_int <- ifelse(sign(min_lon) == -1,
+                        yes = as.numeric(as.integer(min_lon))  + 0.5,
+                        no = as.numeric(as.integer(min_lon)) - 0.5)
+  max_lon_int <- ifelse(sign(max_lon) == -1,
+                        yes = as.numeric(as.integer(max_lon))  + 0.5,
+                        no = as.numeric(as.integer(max_lon)) - 0.5)
+  ## Create the grid
+  lat_seq <- seq(min_lat_int,max_lat_int,1)
+  lon_seq <- seq(min_lon_int,max_lon_int,1)
+  grid <- expand.grid(lon_seq,lat_seq) %>%
+    'colnames<-'(c("lon","lat")) %>%
+    relocate(lon,.after = lat)
+}
+
+
 
 
